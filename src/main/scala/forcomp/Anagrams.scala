@@ -91,10 +91,13 @@ object Anagrams {
    */
   def less(o1:Occurrences, o2: Occurrences): Boolean = {
     val m2: Map[Char, Int] = o2.toMap withDefaultValue 0
-    o1.forall{case (c, n) => m2(c) <= n}
+    o1.forall{case (c, n) => m2(c) >= n}
   }
 
-  def combinations(occurrences: Occurrences): List[Occurrences] = dictionaryByOccurrences.keys.filter(less(_, occurrences)).toList
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    if (occurrences.isEmpty) List(List())
+    else dictionaryByOccurrences.keys.filter(less(_, occurrences)).toList
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    * 
