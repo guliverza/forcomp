@@ -34,13 +34,13 @@ object Anagrams {
    *  Note: the uppercase and lowercase version of the character are treated as the
    *  same character, and are represented as a lowercase character in the occurrence list.
    */
-  def wordOccurrences(w: Word): Occurrences = (w.toList groupBy( char => char)).map(m => (m._1, m._2.length)).toList
+  def wordOccurrences(w: Word): Occurrences = (w.toLowerCase.toList groupBy( char => char)).map(m => (m._1, m._2.length)).toList.sorted
 
   /** Converts a sentence into its character occurrence list. */
   def sentenceOccurrences(s: Sentence): Occurrences = {
-    (s flatMap (w => wordOccurrences(w))).
+    (s flatMap (w => wordOccurrences(w.toLowerCase))).
       groupBy(p => p._1).
-      map{case (char, num) => char -> num.map(_._2).sum}.toList
+      map{case (char, num) => char -> num.map(_._2).sum}.toList.sorted
   }
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
@@ -59,13 +59,13 @@ object Anagrams {
    *
    */
   lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = {
-    val map: List[(Occurrences, Word)] = dictionary.map(w => wordOccurrences(w) -> w)
+    val map: List[(Occurrences, Word)] = dictionary.map(w => wordOccurrences(w.toLowerCase) -> w)
     val by: Map[Occurrences, List[(Occurrences, Word)]] = map.groupBy{case (o, w) => o}
     by.map{case (o, l) => (o, l.map(_._2))} withDefaultValue List()
   }
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences(wordOccurrences(word))
+  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences(wordOccurrences(word.toLowerCase))
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -163,7 +163,7 @@ object Anagrams {
           o <- leftDict
           w <- dictionaryByOccurrences(o)
           rest <- anagrams(o)
-        } yield (w +: rest)
+        } yield w +: rest
         iterable.toList
       }
     }
