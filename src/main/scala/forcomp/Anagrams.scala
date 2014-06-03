@@ -61,7 +61,7 @@ object Anagrams {
   lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = {
     val map: List[(Occurrences, Word)] = dictionary.map(w => wordOccurrences(w) -> w)
     val by: Map[Occurrences, List[(Occurrences, Word)]] = map.groupBy{case (o, w) => o}
-    by.map{case (o, l) => (o, l.map(_._2))} //withDefaultValue List()
+    by.map{case (o, l) => (o, l.map(_._2))} withDefaultValue List()
   }
 
   /** Returns all the anagrams of a given word. */
@@ -157,20 +157,17 @@ object Anagrams {
     def anagrams(in: Occurrences):List[Sentence] = {
       if (in.isEmpty) List(List())
       else {
-        val letters: Iterable[Occurrences] = dict.filter(o => less(o, in))
+        val leftDict: Iterable[Occurrences] = dict.filter(o => less(o, in)).map(anagram => subtract(in, anagram))
 //        val words: Iterable[Word] = letters.flatMap(dictionaryByOccurrences)
-        val map: Iterable[Sentence] = letters.
-          map(anagram => subtract(in, anagram)).
-          flatMap(l => anagrams(l))
-
-
-        for {
-          word <- dictionaryByOccurrences()
-        }
-
+        val iterable: Iterable[List[Word]] = for {
+          o <- leftDict
+          w <- dictionaryByOccurrences(o)
+          rest <- anagrams(o)
+        } yield (w +: rest)
+        iterable.toList
       }
     }
-    anagrams(List(), input)
+    anagrams(input)
 
   }
 
