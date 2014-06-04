@@ -162,24 +162,29 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    val sentenceOccurrences1: Occurrences = sentenceOccurrences(sentence)
-    val combinations1: List[Occurrences] = occurrenceCombinations(sentenceOccurrences1)
-    Nil
+    val anagrams1: List[List[Occurrences]] = anagrams(sentenceOccurrences(sentence))
+
+    def occ2sentence(occurrences: List[Occurrences]): List[Sentence] = occurrences match {
+      case Nil => List(List())
+      case head :: tail =>
+        for {
+          word <- dictionaryByOccurrences(head)
+          rest <- occ2sentence(tail)
+        } yield word +: rest
+    }
+
+    anagrams1.flatMap(a => occ2sentence(a))
   }
 
-  def occurrenceCombinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
-    case Nil => List()
-    case head :: Nil => List(occurrences)
-    case _ =>
+  def anagrams(occurrences: Occurrences): List[List[Occurrences]] = {
+    if (occurrences.isEmpty) List(List())
+    else {
       for {
-        comb <- combinations(occurrences)
-        if !comb.isEmpty
-        sub: Occurrences = subtract(occurrences, comb)
-        rest <- occurrenceCombinations(sub)
-      } yield {
-        println(comb ++ rest)
-        comb ++ rest
-      }
+        word <- combinations(occurrences)
+        if !dictionaryByOccurrences(word).isEmpty
+        anagram <- anagrams(subtract(occurrences, word))
+      } yield word +: anagram
+    }
   }
 
 }
