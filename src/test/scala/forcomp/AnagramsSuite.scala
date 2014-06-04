@@ -83,6 +83,13 @@ class AnagramsSuite extends FunSuite {
     assert(sentenceAnagrams(sentence) === List(Nil))
   }
 
+  test("a") {
+    val w: Occurrences = wordOccurrences("abc")
+    val combinations: List[Occurrences] = occurrenceCombinations(w)
+    println("len : " + combinations.size)
+    combinations.foreach(c => println(c.mkString))
+  }
+
   test("sentence anagrams: Linux rulez") {
     val sentence = List("Linux", "rulez")
     val anas = List(

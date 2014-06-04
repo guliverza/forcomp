@@ -106,19 +106,6 @@ object Anagrams {
     }.toList
   }
 
-//  def my_combinations(occurrences: Occurrences): List[Occurrences] = {
-//    if (occurrences.isEmpty) List()
-//    else {
-//      for {
-//        (char, num) <- occurrences
-//        i <- Range(1, num-1)
-//        subtract1: Occurrences = subtract(occurrences, List((char, num - 1)))
-//        subtract1 +: combinations(subtract1)
-//      } yield {
-//      }
-//    }
-//  }
-
   /** Subtracts occurrence list `y` from occurrence list `x`.
    * 
    *  The precondition is that the occurrence list `y` is a subset of
@@ -175,6 +162,24 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    ???
+    val sentenceOccurrences1: Occurrences = sentenceOccurrences(sentence)
+    val combinations1: List[Occurrences] = occurrenceCombinations(sentenceOccurrences1)
+    Nil
   }
+
+  def occurrenceCombinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
+    case Nil => List()
+    case head :: Nil => List(occurrences)
+    case _ =>
+      for {
+        comb <- combinations(occurrences)
+        if !comb.isEmpty
+        sub: Occurrences = subtract(occurrences, comb)
+        rest <- occurrenceCombinations(sub)
+      } yield {
+        println(comb ++ rest)
+        comb ++ rest
+      }
+  }
+
 }
