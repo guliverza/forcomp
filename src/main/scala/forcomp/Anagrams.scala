@@ -89,15 +89,35 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def less(o1:Occurrences, o2: Occurrences): Boolean = {
+  def lessOrEq(o1:Occurrences, o2: Occurrences): Boolean = {
     val m2: Map[Char, Int] = o2.toMap withDefaultValue 0
     o1.forall{case (c, n) => m2(c) >= n}
   }
 
-  def combinations(occurrences: Occurrences): List[Occurrences] = {
-    if (occurrences.isEmpty) List(List())
-    else dictionaryByOccurrences.keys.filter(less(_, occurrences)).toList
+
+  def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
+    case Nil => List(List())
+    case head :: tail => {
+      val (c, n) = head
+      for {
+        i <- 0 to n
+        ss <- combinations(tail)
+      } yield if (i>0) (c, i) :: ss else ss
+    }.toList
   }
+
+//  def my_combinations(occurrences: Occurrences): List[Occurrences] = {
+//    if (occurrences.isEmpty) List()
+//    else {
+//      for {
+//        (char, num) <- occurrences
+//        i <- Range(1, num-1)
+//        subtract1: Occurrences = subtract(occurrences, List((char, num - 1)))
+//        subtract1 +: combinations(subtract1)
+//      } yield {
+//      }
+//    }
+//  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    * 
@@ -155,43 +175,6 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    val input: Occurrences = sentenceOccurrences(sentence)
-    val dict: Iterable[Occurrences] = dictionaryByOccurrences.keys.filter(less(_, input))
-    def anagrams(in: Occurrences):List[Sentence] = {
-      if (in.isEmpty) List(List())
-      else {
-        val leftDict: Iterable[Occurrences] = dict.filter(o => less(o, in)).map(anagram => subtract(in, anagram))
-//        val words: Iterable[Word] = letters.flatMap(dictionaryByOccurrences)
-        val iterable: Iterable[List[Word]] = for {
-          o <- leftDict
-          w <- dictionaryByOccurrences(o)
-          rest <- anagrams(o)
-        } yield w +: rest
-        iterable.toList
-      }
-    }
-    anagrams(input)
-
+    ???
   }
-
-//  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-//    val input: Occurrences = sentenceOccurrences(sentence)
-//    val dict: Iterable[Occurrences] = dictionaryByOccurrences.keys.filter(less(_, input))
-//    def anagrams(o: Occurrences):List[List[Sentence]] = {
-//      if (o.isEmpty) List(List())
-//      else {
-//
-//        val iterable: Iterable[IndexedSeq[Any]] = for {
-//          w <- dict
-//          if less(w, o)
-//          ww <- dictionaryByOccurrences(w)
-//          rest <- anagrams(subtract(o, w))
-//        } yield (ww ++ rest)
-//        iterable
-//      }
-//    }
-//    anagrams(input)
-//
-//  }
-//
 }
